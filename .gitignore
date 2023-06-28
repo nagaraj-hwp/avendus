@@ -1,0 +1,46 @@
+
+# Compiled source code
+*.o
+*.pyc
+*.class
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Dependency directories
+/node_modules/
+/vendor/
+/.venv/
+
+# Build output
+/dist/
+/build/
+/out/
+
+# Log files
+/log/
+*.log
+
+# Configuration files
+.env
+.env.local
+.env.*.local
+
+# Miscellaneous
+.DS_Store
+thumbs.db
+*.zip
+*.rar
+*.gz
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.sql
