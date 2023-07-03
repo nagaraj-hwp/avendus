@@ -1,44 +1,49 @@
+import mysql.connector
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
-
+from db import get_db_connection
 app = FastAPI()
 
-users = []
 
-class User(BaseModel):
-    id: int
-    username: str
-    email: str
+def get_db_connection():
+    connection = mysql.connector.connect(
+        host="localhost",
+        user="your_username",
+        password="your_password",
+        database="your_database"
+    )
+    return connection
 
-@app.get("/users", response_model=List[User])
-def get_users():
-    return users
 
-@app.get("/users/{user_id}", response_model=User)
-def get_user(user_id: int):
-    for user in users:
-        if user.id == user_id:
-            return user
-    return {"error": "User not found"}
+class DealData(BaseModel):
+    deal_date: str
+    security_code: str
+    security_name: str
+    client_name: str
+    deal_type: str
+    quantity: int
+    price: float
 
-@app.post("/users", response_model=User)
-def create_user(user: User):
-    users.append(user)
-    return user
 
-@app.put("/users/{user_id}", response_model=User)
-def update_user(user_id: int, user: User):
-    for i, existing_user in enumerate(users):
-        if existing_user.id == user_id:
-            users[i] = user
-            return user
-    return {"error": "User not found"}
+@app.post("/deals")
+async def create_deal(deal_data: DealData):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    query = "INSERT INTO deals (deal_date, security_code, security_name, client_name, deal_type, quantity, price) " \
+            "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+    values = (
+        deal_data.deal_date,
+        deal_data.security_code,
+        deal_data.security_name,
+        deal_data.client_name,
+        deal_data.deal_type,
+        deal_data.quantity,
+        deal_data.price
+    )
+    cursor.execute(query, values)
+    connection.commit()
+    cursor.close()
+    connection.close()
 
-@app.delete("/users/{user_id}")
-def delete_user(user_id: int):
-    for i, user in enumerate(users):
-        if user.id == user_id:
-            users.pop(i)
-            return {"message": "User deleted successfully"}
-    return {"error": "User not found"}
+    return {"message": "Deal created successfully"}
